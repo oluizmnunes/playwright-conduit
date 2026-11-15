@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { APIRequestContext } from '@playwright/test';
 
 const apiUrl = 'https://api.realworld.show/api';
@@ -9,17 +10,17 @@ export type TestUser = {
 };
 
 export const editorUser: TestUser = {
-  email: 'automation.editor1234@test.com',
+  email: 'automation.editor@test.com',
   password: 'AutoPassword123',
   username: 'automationeditor',
 };
 
 export function createLoginUser(): TestUser {
-  const id = `${Date.now()}${Math.floor(Math.random() * 10000)}`;
+  const username = faker.string.alphanumeric({ length: 12 }).toLowerCase();
   return {
-    email: `login${id}@test.com`,
-    password: 'AutoPassword123',
-    username: `login${id}`.slice(0, 20),
+    email: faker.internet.email({ firstName: username }),
+    password: faker.internet.password({ length: 12 }),
+    username,
   };
 }
 

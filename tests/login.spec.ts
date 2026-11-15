@@ -1,26 +1,26 @@
 import { test, expect } from "@playwright/test";
 import { LoginPage } from "../pages/login.page";
-import { ensureUser, loginUser } from "../helpers/ensure-user";
+import { createLoginUser, ensureUser } from "../helpers/ensure-user";
 
 test.describe("Login Page", () => {
   test.describe("valid account", () => {
-    test.beforeEach(async ({ request }) => {
-      await ensureUser(request, loginUser);
-    });
-
-    test("user can sign in", async ({ page }) => {
+    test("user can sign in", async ({ page, request }) => {
+      const user = createLoginUser();
+      await ensureUser(request, user);
       const loginPage = new LoginPage(page);
 
       await loginPage.goto();
-      await loginPage.login(loginUser.email, loginUser.password);
+      await loginPage.login(user.email, user.password);
       await expect(page.getByRole("link", { name: "New Article" })).toBeVisible();
     });
 
-    test("user can sign out", async ({ page }) => {
+    test("user can sign out", async ({ page, request }) => {
+      const user = createLoginUser();
+      await ensureUser(request, user);
       const loginPage = new LoginPage(page);
 
       await loginPage.goto();
-      await loginPage.login(loginUser.email, loginUser.password);
+      await loginPage.login(user.email, user.password);
       await expect(page.getByRole("link", { name: "New Article" })).toBeVisible();
 
       await page.getByRole("link", { name: "Settings" }).click();

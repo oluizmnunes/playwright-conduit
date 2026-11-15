@@ -12,6 +12,8 @@ import { defineConfig, devices } from "@playwright/test";
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
+  timeout: 15_000,              // max time for one test (default 30s)
+  expect: { timeout: 10_000 },   // max time for each expect() auto-retry (default 5s)
   testDir: "./tests",
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -20,6 +22,9 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
+  // The demo backend allows only one active login session, so local runs
+  // must serialize authenticated and guest tests to avoid invalidating tokens.
+  //workers: 1,
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
@@ -27,7 +32,6 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
     baseURL: "https://demo.realworld.show/",
-
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
   },
@@ -48,13 +52,14 @@ export default defineConfig({
       testIgnore: /login\.spec\.ts/,
       dependencies: ["setup"], // run "setup" project before this one
     },
-    
+
     {
       name: "chromium-guest",
-      use: { 
-        ...devices["Desktop Chrome"] 
+      use: {
+        ...devices["Desktop Chrome"]
       },
       testMatch: /login\.spec\.ts/,
+      dependencies: ["setup"],
     },
 
     {
@@ -69,10 +74,11 @@ export default defineConfig({
 
     {
       name: "firefox-guest",
-      use: { 
-        ...devices["Desktop Chrome"] 
+      use: {
+        ...devices["Desktop Chrome"]
       },
       testMatch: /login\.spec\.ts/,
+      dependencies: ["setup"],
     },
 
     {
@@ -87,10 +93,11 @@ export default defineConfig({
 
     {
       name: "webkit-guest",
-      use: { 
-        ...devices["Desktop Chrome"] 
+      use: {
+        ...devices["Desktop Chrome"]
       },
       testMatch: /login\.spec\.ts/,
+      dependencies: ["setup"],
     },
 
     /* Test against mobile viewports. */

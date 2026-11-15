@@ -9,16 +9,19 @@ export type TestUser = {
 };
 
 export const editorUser: TestUser = {
-  email: 'automation.editor@test.com',
+  email: 'automation.editor1234@test.com',
   password: 'AutoPassword123',
-  username: 'automation.editor',
+  username: 'automationeditor',
 };
 
-export const loginUser: TestUser = {
-  email: 'automation.editor@test.com',
-  password: 'AutoPassword123',
-  username: 'automation.login',
-};
+export function createLoginUser(): TestUser {
+  const id = `${Date.now()}${Math.floor(Math.random() * 10000)}`;
+  return {
+    email: `login${id}@test.com`,
+    password: 'AutoPassword123',
+    username: `login${id}`.slice(0, 20),
+  };
+}
 
 export async function ensureUser(request: APIRequestContext, user: TestUser) {
   const loginResponse = await request.post(`${apiUrl}/users/login`, {
@@ -30,9 +33,15 @@ export async function ensureUser(request: APIRequestContext, user: TestUser) {
     },
   });
 
-  if (!loginResponse.ok()) {
-    await request.post(`${apiUrl}/users`, {
-      data: { user },
-    });
+  if (loginResponse.ok()) {
+    return;
+  }
+
+  const registerResponse = await request.post(`${apiUrl}/users`, {
+    data: { user },
+  });
+
+  if (!registerResponse.ok()) {
+    throw new Error(`Could not create user ${user.email}: ${await registerResponse.text()}`);
   }
 }

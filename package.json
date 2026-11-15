@@ -1,19 +1,19 @@
 {
-  "name": "playwright-framework",
+  "name": "playwright-conduit",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/oluizmnunes/practice-repo.git"
+    "url": "git+https://github.com/oluizmnunes/playwright-conduit.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/oluizmnunes/practice-repo/issues"
+    "url": "https://github.com/oluizmnunes/playwright-conduit/issues"
   },
-  "homepage": "https://github.com/oluizmnunes/practice-repo#readme",
+  "homepage": "https://github.com/oluizmnunes/playwright-conduit#readme",
   "description": "",
   "devDependencies": {
     "@faker-js/faker": "^10.6.0",

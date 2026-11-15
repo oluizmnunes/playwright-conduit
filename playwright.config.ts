@@ -22,9 +22,6 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  // The demo backend allows only one active login session, so local runs
-  // must serialize authenticated and guest tests to avoid invalidating tokens.
-  //workers: 1,
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
@@ -50,7 +47,27 @@ export default defineConfig({
         storageState: "./playwright/.auth/user.json",
       },
       testIgnore: /login\.spec\.ts/,
-      dependencies: ["setup"], // run "setup" project before this one
+      dependencies: ["setup"],
+    },
+
+    {
+      name: "firefox",
+      use: {
+        ...devices["Desktop Firefox"],
+        storageState: "./playwright/.auth/user.json",
+      },
+      testIgnore: /login\.spec\.ts/,
+      dependencies: ["setup"],
+    },
+
+    {
+      name: "webkit",
+      use: {
+        ...devices["Desktop Safari"],
+        storageState: "./playwright/.auth/user.json",
+      },
+      testIgnore: /login\.spec\.ts/,
+      dependencies: ["setup"],
     },
 
     {
@@ -63,38 +80,18 @@ export default defineConfig({
     },
 
     {
-      name: "firefox",
-      use: {
-        ...devices["Desktop Chrome"],
-        storageState: "./playwright/.auth/user.json",
-      },
-      testIgnore: /login\.spec\.ts/,
-      dependencies: ["setup"],
-    },
-
-    {
       name: "firefox-guest",
       use: {
-        ...devices["Desktop Chrome"]
+        ...devices["Desktop Firefox"]
       },
       testMatch: /login\.spec\.ts/,
       dependencies: ["setup"],
     },
 
     {
-      name: "webkit",
-      use: {
-        ...devices["Desktop Chrome"],
-        storageState: "./playwright/.auth/user.json",
-      },
-      testIgnore: /login\.spec\.ts/,
-      dependencies: ["setup"], // run "setup" project before this one
-    },
-
-    {
       name: "webkit-guest",
       use: {
-        ...devices["Desktop Chrome"]
+        ...devices["Desktop Safari"]
       },
       testMatch: /login\.spec\.ts/,
       dependencies: ["setup"],

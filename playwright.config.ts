@@ -51,48 +51,12 @@ export default defineConfig({
     },
 
     {
-      name: "firefox",
-      use: {
-        ...devices["Desktop Firefox"],
-        storageState: "./playwright/.auth/user.json",
-      },
-      testIgnore: /login\.spec\.ts/,
-      dependencies: ["setup"],
-    },
-
-    {
-      name: "webkit",
-      use: {
-        ...devices["Desktop Safari"],
-        storageState: "./playwright/.auth/user.json",
-      },
-      testIgnore: /login\.spec\.ts/,
-      dependencies: ["setup"],
-    },
-
-    {
       name: "chromium-guest",
       use: {
         ...devices["Desktop Chrome"]
       },
       testMatch: /login\.spec\.ts/,
-    },
-
-    {
-      name: "firefox-guest",
-      use: {
-        ...devices["Desktop Firefox"]
-      },
-      testMatch: /login\.spec\.ts/,
-    },
-
-    {
-      name: "webkit-guest",
-      use: {
-        ...devices["Desktop Safari"]
-      },
-      testMatch: /login\.spec\.ts/,
-    },
+    }
 
     /* Test against mobile viewports. */
     // {

@@ -56,6 +56,9 @@ export default defineConfig({
         ...devices["Desktop Chrome"]
       },
       testMatch: /login\.spec\.ts/,
+      // "setup" project signs in once and saves the token. Editor tests reuse it.
+      // login.spec.ts signs in again and replaces that token, so it runs last.
+      dependencies: ["chromium"],
     }
 
     /* Test against mobile viewports. */

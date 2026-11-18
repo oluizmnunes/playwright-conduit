@@ -76,7 +76,6 @@ export default defineConfig({
         ...devices["Desktop Chrome"]
       },
       testMatch: /login\.spec\.ts/,
-      dependencies: ["setup"],
     },
 
     {
@@ -85,7 +84,6 @@ export default defineConfig({
         ...devices["Desktop Firefox"]
       },
       testMatch: /login\.spec\.ts/,
-      dependencies: ["setup"],
     },
 
     {
@@ -94,7 +92,6 @@ export default defineConfig({
         ...devices["Desktop Safari"]
       },
       testMatch: /login\.spec\.ts/,
-      dependencies: ["setup"],
     },
 
     /* Test against mobile viewports. */

@@ -16,11 +16,10 @@ export const editorUser: TestUser = {
 };
 
 export function createLoginUser(): TestUser {
-  const username = faker.string.alphanumeric({ length: 12 }).toLowerCase();
   return {
-    email: faker.internet.email({ firstName: username }),
-    password: faker.internet.password({ length: 12 }),
-    username,
+    email: `${faker.string.alphanumeric(6).toLowerCase()}@automation.com`.toLowerCase(),
+    password: faker.internet.password({ length: 8 }),
+    username: faker.internet.username().toLowerCase(),
   };
 }
 

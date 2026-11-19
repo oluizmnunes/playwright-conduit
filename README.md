@@ -16,8 +16,8 @@ E2E and API tests for the [RealWorld demo app](https://demo.realworld.show/) and
 ## Approach
 
 - Page objects in `pages/` hold the locators and actions for the login and editor screens.
-- Editor tests share one signed-in session. The setup project saves it to `playwright/.auth/user.json`, and the `chromium` project loads that state.
-- Login tests stay signed out. Each one creates its own user and signs in through the UI, after the editor tests, so a new login does not replace the saved token.
+- Article tests share one signed-in session. The setup project saves it to `playwright/.auth/user.json`, and the `chromium` project loads that state.
+- Login tests stay signed out. Each one creates its own user and signs in through the UI, after the article tests, so a new login does not replace the saved token.
 
 ## Run
 

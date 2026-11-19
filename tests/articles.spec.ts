@@ -3,7 +3,7 @@ import { EditorPage } from '../pages/editor.page';
 import { faker } from '@faker-js/faker';
 
 
-test.describe('Editor Page', () => {
+test.describe('Articles', () => {
   test('user can create a new article visible on the Global Feed', async ({ page }) => {
     const editorPage = new EditorPage(page);
 

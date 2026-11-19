@@ -4,11 +4,11 @@ import { faker } from '@faker-js/faker';
 
 
 test.describe('Articles', () => {
-  test('user can create a new article visible on the Global Feed', async ({ page }) => {
+  test('user can create a new article and it is visible on the Global Feed', async ({ page }) => {
     const editorPage = new EditorPage(page);
 
     const article = {
-      title: faker.lorem.sentence(),
+      title: faker.lorem.sentence( { min: 1, max: 3 }),
       about: 'Auto-waiting',
       content: 'Playwright performs a range of actionability checks...',
       tags: ['Visible', 'Stable', 'Receives Events', 'Enable', 'Editable'],
@@ -22,11 +22,11 @@ test.describe('Articles', () => {
     await expect(page.getByRole('heading', { name: article.title, level: 1 })).toBeVisible();
   });
 
-  test('user can delete a new article removed from the Global Feed', async ({ page }) => {
+  test('user can delete a new article and it is removed from the Global Feed', async ({ page }) => {
     const editorPage = new EditorPage(page);
 
     const article = {
-      title: faker.lorem.sentence(),
+      title: faker.lorem.sentence( { min: 1, max: 3 }),
       about: 'Trace viewer',
       content: 'Playwright Trace Viewer is a GUI tool that lets you explore recorded...',
       tags: ['HTML report', 'Traces'],
@@ -39,7 +39,7 @@ test.describe('Articles', () => {
     await expect(page.getByRole('heading', { name: article.title, level: 1 })).not.toBeVisible();
   });
 
-  test('should show a validation error when the title is empty', async ( {page} ) => {
+  test('should show a validation error when the article title is empty', async ( {page} ) => {
     const editorPage = new EditorPage(page);
     
     const article = {
@@ -94,5 +94,41 @@ test.describe('Articles', () => {
     await feedResponse;
 
     await expect(page.getByRole('heading', { name: updatedArticle.title, level: 1 })).toBeVisible();
-  })
+  });
+
+  test('article body is rendered as markdown', async ( {page} ) => {
+    const editorPage = new EditorPage(page);
+
+    const article = {
+      title: faker.lorem.sentence( { min: 1, max: 3 }),
+      about: 'Markdown',
+      content: [
+        '# Playwright',
+        '',
+        '## Actionability',
+        '',
+        'An element must be **visible**, *stable*, and enabled.',
+        '',
+        '| Check | Result |',
+        '| --- | --- |',
+        '| Visible | Pass |',
+        '| Stable | Pass |',
+        '| Enabled | Pass |',
+      ].join('\n'),
+      tags: ['Markdown', 'Formatting', 'Syntax'],
+    };
+
+    await editorPage.publishArticle(article);
+
+    const articleContent = page.locator('.article-content');
+
+    await expect(articleContent.getByRole('heading', { level: 1, name: 'Playwright' })).toBeVisible();
+    await expect(articleContent.getByRole('heading', { level: 2, name: 'Actionability' })).toBeVisible();
+    await expect(articleContent.locator('p')).toHaveText('An element must be visible, stable, and enabled.');
+    await expect(articleContent.locator('strong')).toHaveText('visible');
+    await expect(articleContent.locator('em')).toHaveText('stable');
+    await expect(articleContent.locator('th')).toHaveText(['Check', 'Result']);
+    await expect(articleContent.locator('td')).toHaveText(['Visible', 'Pass', 'Stable', 'Pass', 'Enabled', 'Pass']);
+  });
+
 });

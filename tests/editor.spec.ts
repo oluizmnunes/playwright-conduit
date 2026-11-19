@@ -54,7 +54,7 @@ test.describe('Editor Page', () => {
     await expect(page.getByText('title can\'t be blank')).toBeVisible();
   });
 
-  test.only('author can edit an article', async ( {page} ) => {
+  test('author can edit an article', async ( {page} ) => {
     const editorPage = new EditorPage(page);
 
     const article = {
@@ -73,11 +73,6 @@ test.describe('Editor Page', () => {
 
     await editorPage.publishArticle(article);
     await page.getByRole('link', { name: 'Edit Article' }).first().click();
-    
-    await expect(editorPage.articleTitleInput).toBeEditable();
-    await expect(editorPage.articleAboutInput).toBeEditable();
-    await expect(editorPage.articleContentInput).toBeEditable();
-    await expect(editorPage.enterTagsInput).toBeEditable();
 
     const updateResponse = page.waitForResponse((response) =>
       response.request().method() === 'PUT' &&

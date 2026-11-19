@@ -9,13 +9,13 @@ export type Article = {
 };
 
 export class EditorPage {
-    readonly editorInput: Locator;
+    readonly articleTitleInput: Locator;
     readonly articleAboutInput: Locator;
     readonly articleContentInput: Locator;
     readonly enterTagsInput: Locator;
 
     constructor(private readonly page: Page) {
-        this.editorInput = this.page.getByPlaceholder('Article Title');
+        this.articleTitleInput = this.page.getByPlaceholder('Article Title');
         this.articleAboutInput = this.page.getByPlaceholder("What's this article about?");
         this.articleContentInput = this.page.getByPlaceholder('Write your article (in markdown)');
         this.enterTagsInput = this.page.getByPlaceholder('Enter tags');
@@ -26,7 +26,7 @@ export class EditorPage {
     }
 
     async fillArticleFields({title, about, content, tags}: Article) {
-        await this.editorInput.fill(title);
+        await this.articleTitleInput.fill(title);
         await this.articleAboutInput.fill(about);
         await this.articleContentInput.fill(content);
 

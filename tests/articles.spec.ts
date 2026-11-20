@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { EditorPage } from '../pages/editor.page';
 import { faker } from '@faker-js/faker';
 import { createArticle } from '../helpers/articles';
+import { editorUser } from '../helpers/ensure-user';
 
 
 test.describe('Articles', () => {
@@ -62,14 +63,15 @@ test.describe('Articles', () => {
       await editorPage.publishArticleButton.click();
       await updateResponse;
 
-      const feedResponse = page.waitForResponse((response) =>
+      const authorArticlesResponse = page.waitForResponse((response) =>
         response.request().method() === 'GET' &&
         response.url().includes('/api/articles?') &&
+        response.url().includes(`author=${editorUser.username}`) &&
         response.ok()
       );
 
-      await page.getByRole('navigation').getByRole('link', { name: 'Conduit' }).click();
-      await feedResponse;
+      await page.getByRole('navigation').getByRole('link', { name: editorUser.username }).click();
+      await authorArticlesResponse;
 
       await expect(page.getByRole('heading', { name: updatedArticle.title, level: 1 })).toBeVisible();
 
@@ -80,6 +82,7 @@ test.describe('Articles', () => {
       await expect(page.getByText(updatedArticle.content)).toBeVisible();
 
       const tagList = page.locator('.tag-list li');
+      
       for (const tag of updatedArticle.tags) {
         await expect(tagList.filter({ hasText: tag })).toBeVisible();
       }

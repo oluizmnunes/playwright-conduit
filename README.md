@@ -27,4 +27,4 @@ npx playwright install chromium
 npx playwright test
 ```
 
-GitHub Actions already runs this suite on every push and pull request to `main`, and uploads Playwright's HTML report. An Allure report will be added later.
+GitHub Actions runs this suite on every push and pull request to `main`. Each run uploads the Playwright HTML report and the Allure report as artifacts. Pushes to `main` also publish the Allure report at https://oluizmnunes.github.io/playwright-conduit/.

@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { EditorPage } from '../pages/editor.page';
 import { faker } from '@faker-js/faker';
+import { createArticle } from '../helpers/articles';
 
 
 test.describe('Articles', () => {
@@ -42,32 +43,23 @@ test.describe('Articles', () => {
 
     test('author can edit an article', async ( {page} ) => {
       const editorPage = new EditorPage(page);
-
-      const article = {
-        title: faker.lorem.sentence(),
-        about: 'Emulation',
-        content: 'With Playwright you can test your app on any browser as well as emulate...',
-        tags: ['Devices', 'Viewport', 'isMobile', 'Locale & Timezone'],
-      };
-
+      const article = await createArticle(page);
       const updatedArticle = {
         title: article.title + ' Updated',
         about: 'Command line',
         content: 'Playwright provides a powerful command line interface for running tests...',
         tags: ['--debug', '--project <name>', '-g <grep>', '--workers'],
       };
-
-      await editorPage.publishArticle(article);
-      await page.getByRole('link', { name: 'Edit Article' }).first().click();
-
       const updateResponse = page.waitForResponse((response) =>
         response.request().method() === 'PUT' &&
         response.url().includes('/api/articles/') &&
         response.ok()
       );
 
+      await page.getByRole('heading', { name: article.title, level: 1 }).click();
+      await page.getByRole('link', { name: 'Edit Article' }).first().click();
       await editorPage.fillArticleFields(updatedArticle);
-      await page.getByRole('button', { name: 'Publish Article' }).click();
+      await editorPage.publishArticleButton.click();
       await updateResponse;
 
       const feedResponse = page.waitForResponse((response) =>
@@ -80,6 +72,17 @@ test.describe('Articles', () => {
       await feedResponse;
 
       await expect(page.getByRole('heading', { name: updatedArticle.title, level: 1 })).toBeVisible();
+
+      await page.getByRole('heading', { name: updatedArticle.title}).click();
+
+      await expect(page.getByText(updatedArticle.title)).toBeVisible();
+      await expect(page.getByText(updatedArticle.about)).toBeVisible();
+      await expect(page.getByText(updatedArticle.content)).toBeVisible();
+
+      const tagList = page.locator('.tag-list li');
+      for (const tag of updatedArticle.tags) {
+        await expect(tagList.filter({ hasText: tag })).toBeVisible();
+      }
     });
 
     test('article body is rendered as markdown', async ( {page} ) => {

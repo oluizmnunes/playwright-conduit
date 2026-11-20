@@ -21,10 +21,21 @@ E2E and API tests for the [RealWorld demo app](https://demo.realworld.show/) and
 
 ## Run
 
+Tests hit the public [demo](https://demo.realworld.show/). There is no app to start locally.
+
+**1. Install** (once per machine)
+
 ```bash
 npm install
 npx playwright install chromium
-npx playwright test
 ```
 
-GitHub Actions runs this suite on every push and pull request to `main`. Each run uploads the Playwright HTML report and the Allure report as artifacts. Pushes to `main` also publish the Allure report at https://oluizmnunes.github.io/playwright-conduit/.
+**2. Run the suite**
+
+```bash
+npx playwright test
+npx playwright test --headed               # watch the browser
+npx playwright show-report                 # last HTML report
+```
+
+GitHub Actions runs the suite on every push and pull request to `main`. The [Allure report](https://oluizmnunes.github.io/playwright-conduit/) is the latest result from `main`. Each workflow run also keeps the Playwright HTML report and the Allure report as artifacts.

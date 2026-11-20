@@ -59,6 +59,7 @@ test.describe('Articles', () => {
 
       await page.getByRole('heading', { name: article.title, level: 1 }).click();
       await page.getByRole('link', { name: 'Edit Article' }).first().click();
+      await expect(editorPage.articleTitleInput).toHaveValue(article.title);
       await editorPage.fillArticleFields(updatedArticle);
       await editorPage.publishArticleButton.click();
       await updateResponse;

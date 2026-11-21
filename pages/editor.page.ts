@@ -1,5 +1,5 @@
 import { Locator, Page } from '@playwright/test';
-
+import { expect } from '@playwright/test';
 
 export type Article = {
     title: string;
@@ -42,5 +42,13 @@ export class EditorPage {
         await this.goto();
         await this.fillArticleFields({title, about, content, tags});
         await this.publishArticleButton.click();
+    }
+
+    async expectTags(tags: string[]) {
+        const tagList = this.page.locator('.tag-list .tag-pill');
+
+        for (const tag of tags) {
+            await expect(tagList.filter({ hasText: tag })).toBeVisible();
+        }
     }
 }

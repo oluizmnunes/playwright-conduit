@@ -82,11 +82,7 @@ test.describe('Articles', () => {
       await expect(page.getByText(updatedArticle.about)).toBeVisible();
       await expect(page.getByText(updatedArticle.content)).toBeVisible();
 
-      const tagList = page.locator('.tag-list li');
-      
-      for (const tag of updatedArticle.tags) {
-        await expect(tagList.filter({ hasText: tag })).toBeVisible();
-      }
+      await editorPage.expectTags(updatedArticle.tags);
     });
 
     test('article body is rendered as markdown', async ( {page} ) => {
@@ -201,6 +197,64 @@ test.describe('Articles', () => {
       await page.getByRole('button', { name: 'Publish Article' }).click();
 
       await expect(page.getByText('token is missing')).toBeVisible();
+    });
+  });
+
+  test.describe('server error', () => {
+    test('keeps the draft and allows retry when publish returns 500', async ({ page }) => {
+      const editorPage = new EditorPage(page);
+      const article = {
+        title: faker.lorem.sentence({ min: 1, max: 3 }),
+        about: 'Server error',
+        content: 'The draft should stay on the page when publish fails.',
+        tags: ['Retry', 'Banner'],
+      };
+
+      await page.route('https://api.realworld.show/api/articles', (route) => route.fulfill({ status: 500 }));
+      await editorPage.publishArticle(article);
+
+      await expect(page.locator('.error-messages')).toContainText('Unable to connect. Please check your internet connection.');
+      await expect(editorPage.articleTitleInput).toHaveValue(article.title);
+      await expect(editorPage.articleAboutInput).toHaveValue(article.about);
+      await expect(editorPage.articleContentInput).toHaveValue(article.content);
+      await editorPage.expectTags(article.tags);
+      await expect(editorPage.publishArticleButton).toBeEnabled();
+
+      await page.unroute('https://api.realworld.show/api/articles');
+      await editorPage.publishArticleButton.click();
+
+      await expect(page.getByRole('heading', { name: article.title, level: 1 })).toBeVisible();
+    });
+
+    test('keeps the draft and allows retry when update returns 500', async ({ page }) => {
+      const editorPage = new EditorPage(page);
+      const article = await createArticle(page);
+      const updatedArticle = {
+        title: faker.lorem.sentence({ min: 1, max: 3 }),
+        about: 'Unavailable',
+        content: 'The edited draft should stay on the page when update fails.',
+        tags: ['Retry', 'Banner'],
+      };
+
+      await page.goto(`/editor/${article.slug}`);
+
+      await expect(editorPage.articleTitleInput).toHaveValue(article.title);
+
+      await editorPage.fillArticleFields(updatedArticle);
+      await page.route(`https://api.realworld.show/api/articles/${article.slug}`, (route) => route.fulfill({ status: 500 }));
+      await editorPage.publishArticleButton.click();
+
+      await expect(page.locator('.error-messages')).toContainText('Unable to connect. Please check your internet connection.');
+      await expect(editorPage.articleTitleInput).toHaveValue(updatedArticle.title);
+      await expect(editorPage.articleAboutInput).toHaveValue(updatedArticle.about);
+      await expect(editorPage.articleContentInput).toHaveValue(updatedArticle.content);
+      await editorPage.expectTags(updatedArticle.tags);
+      await expect(editorPage.publishArticleButton).toBeEnabled();
+
+      await page.unroute(`https://api.realworld.show/api/articles/${article.slug}`);
+      await editorPage.publishArticleButton.click();
+
+      await expect(page.getByRole('heading', { name: updatedArticle.title, level: 1 })).toBeVisible();
     });
   });
 });

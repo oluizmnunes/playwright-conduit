@@ -210,8 +210,15 @@ test.describe('Articles', () => {
         tags: ['Retry', 'Banner'],
       };
 
-      await page.route('https://api.realworld.show/api/articles', (route) => route.fulfill({ status: 500 }));
-      await editorPage.publishArticle(article);
+      await editorPage.goto();
+      await editorPage.fillArticleFields(article);
+      await page.route('https://api.realworld.show/api/articles', (route) => {
+        if (route.request().method() !== 'POST') {
+          return route.continue();
+        }
+        return route.fulfill({ status: 500 });
+      });
+      await editorPage.publishArticleButton.click();
 
       await expect(page.locator('.error-messages')).toContainText('Unable to connect. Please check your internet connection.');
       await expect(editorPage.articleTitleInput).toHaveValue(article.title);

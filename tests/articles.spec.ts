@@ -11,7 +11,7 @@ test.describe('Articles', () => {
       const editorPage = new EditorPage(page);
 
       const article = {
-        title: faker.lorem.sentence( { min: 1, max: 3 }),
+        title: faker.lorem.sentence( { min: 2, max: 3 }),
         about: 'Auto-waiting',
         content: 'Playwright performs a range of actionability checks...',
         tags: ['Visible', 'Stable', 'Receives Events', 'Enable', 'Editable'],
@@ -29,7 +29,7 @@ test.describe('Articles', () => {
       const editorPage = new EditorPage(page);
 
       const article = {
-        title: faker.lorem.sentence( { min: 1, max: 3 }),
+        title: faker.lorem.sentence( { min: 2, max: 3 }),
         about: 'Trace viewer',
         content: 'Playwright Trace Viewer is a GUI tool that lets you explore recorded...',
         tags: ['HTML report', 'Traces'],
@@ -89,7 +89,7 @@ test.describe('Articles', () => {
       const editorPage = new EditorPage(page);
 
       const article = {
-        title: faker.lorem.sentence( { min: 1, max: 3 }),
+        title: faker.lorem.sentence( { min: 2, max: 3 }),
         about: 'Markdown',
         content: [
           '# Playwright',
@@ -160,7 +160,7 @@ test.describe('Articles', () => {
     test('should show a validation error when a tag is too long', async ( {page} ) => {
       const editorPage = new EditorPage(page);
       const article = {
-        title: faker.lorem.sentence( { min: 1, max: 3 }),
+        title: faker.lorem.sentence( { min: 2, max: 3 }),
         about: 'Tags',
         content: 'A tag must be shorter than the limit.',
         tags: ['c'.repeat(21)],
@@ -205,7 +205,7 @@ test.describe('Articles', () => {
     test('should not be able to publish article logged out', async ( {page} ) => {
       const editorPage = new EditorPage(page);
       const article = {
-        title: faker.lorem.sentence( { min: 1, max: 3 }),
+        title: faker.lorem.sentence( { min: 2, max: 3 }),
         about: 'Logged out',
         content: 'You must be logged in to publish an article.',
         tags: [],
@@ -224,7 +224,7 @@ test.describe('Articles', () => {
     test('keeps the draft and allows retry when publish returns 500', async ({ page }) => {
       const editorPage = new EditorPage(page);
       const article = {
-        title: faker.lorem.sentence({ min: 1, max: 3 }),
+        title: faker.lorem.sentence({ min: 2, max: 3 }),
         about: 'Server error',
         content: 'The draft should stay on the page when publish fails.',
         tags: ['Retry', 'Banner'],
@@ -252,7 +252,7 @@ test.describe('Articles', () => {
       const editorPage = new EditorPage(page);
       const article = await createArticle(page);
       const updatedArticle = {
-        title: faker.lorem.sentence({ min: 1, max: 3 }),
+        title: faker.lorem.sentence({ min: 2, max: 3 }),
         about: 'Unavailable',
         content: 'The edited draft should stay on the page when update fails.',
         tags: ['Retry', 'Banner'],
@@ -272,6 +272,43 @@ test.describe('Articles', () => {
       await editorPage.publishArticleButton.click();
 
       await expect(page.getByRole('heading', { name: updatedArticle.title, level: 1 })).toBeVisible();
+    });
+  });
+
+  test.describe('slow network', () => {
+    test('disables publish while the article request is in flight', async ({ page }) => {
+      const editorPage = new EditorPage(page);
+      const article = {
+        title: faker.lorem.sentence({ min: 2, max: 3 }),
+        about: 'Slow network',
+        content: 'A second click should not publish again.',
+        tags: [],
+      };
+      let posts = 0;
+
+      await editorPage.goto();
+      await editorPage.fillArticleFields(article);
+      const published = page.waitForResponse((response) =>
+        response.request().method() === 'POST' &&
+        response.url() === 'https://api.realworld.show/api/articles'
+      );
+      await page.route('https://api.realworld.show/api/articles', async (route) => {
+        if (route.request().method() !== 'POST') {
+          return route.continue();
+        }
+
+        posts += 1;
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        return route.continue();
+      });
+
+      await editorPage.publishArticleButton.click();
+      await expect(editorPage.publishArticleButton).toBeDisabled();
+      await editorPage.publishArticleButton.click({ force: true });
+
+      expect(posts).toBe(1);
+      
+      await published;
     });
   });
 });

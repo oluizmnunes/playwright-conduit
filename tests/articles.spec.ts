@@ -240,12 +240,7 @@ test.describe('Articles', () => {
       });
       await editorPage.publishArticleButton.click();
 
-      await expect(page.locator('.error-messages')).toContainText('Unable to connect. Please check your internet connection.');
-      await expect(editorPage.articleTitleInput).toHaveValue(article.title);
-      await expect(editorPage.articleAboutInput).toHaveValue(article.about);
-      await expect(editorPage.articleContentInput).toHaveValue(article.content);
-      await editorPage.expectTags(article.tags);
-      await expect(editorPage.publishArticleButton).toBeEnabled();
+      await editorPage.expectDraftKept(article);
 
       await page.unroute('https://api.realworld.show/api/articles');
       await editorPage.publishArticleButton.click();
@@ -271,12 +266,7 @@ test.describe('Articles', () => {
       await page.route(`https://api.realworld.show/api/articles/${article.slug}`, (route) => route.fulfill({ status: 500 }));
       await editorPage.publishArticleButton.click();
 
-      await expect(page.locator('.error-messages')).toContainText('Unable to connect. Please check your internet connection.');
-      await expect(editorPage.articleTitleInput).toHaveValue(updatedArticle.title);
-      await expect(editorPage.articleAboutInput).toHaveValue(updatedArticle.about);
-      await expect(editorPage.articleContentInput).toHaveValue(updatedArticle.content);
-      await editorPage.expectTags(updatedArticle.tags);
-      await expect(editorPage.publishArticleButton).toBeEnabled();
+      await editorPage.expectDraftKept(updatedArticle);
 
       await page.unroute(`https://api.realworld.show/api/articles/${article.slug}`);
       await editorPage.publishArticleButton.click();

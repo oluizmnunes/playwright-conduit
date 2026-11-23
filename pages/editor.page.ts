@@ -51,4 +51,13 @@ export class EditorPage {
             await expect(tagList.filter({ hasText: tag })).toBeVisible();
         }
     }
+
+    async expectDraftKept(article: Article) {
+        await expect(this.page.locator('.error-messages')).toContainText('Unable to connect. Please check your internet connection.');
+        await expect(this.articleTitleInput).toHaveValue(article.title);
+        await expect(this.articleAboutInput).toHaveValue(article.about);
+        await expect(this.articleContentInput).toHaveValue(article.content);
+        await this.expectTags(article.tags);
+        await expect(this.publishArticleButton).toBeEnabled();
+    }
 }

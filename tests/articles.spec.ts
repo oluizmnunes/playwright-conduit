@@ -119,6 +119,26 @@ test.describe('Articles', () => {
       await expect(articleContent.locator('th')).toHaveText(['Check', 'Result']);
       await expect(articleContent.locator('td')).toHaveText(['Visible', 'Pass', 'Stable', 'Pass', 'Enabled', 'Pass']);
     });
+
+    test('user can favorite and unfavorite an article', async ({ page }) => {
+      const article = await createArticle(page);
+      await page.goto(`/profile/${editorUser.username}`);
+      const preview = page.locator('.article-preview').filter({ has: page.getByRole('heading', { name: article.title, level: 1 }) });
+      const favoriteButton = preview.getByRole('button');
+
+      await expect(favoriteButton).toContainText('0');
+      await favoriteButton.click();
+      await expect(favoriteButton).toContainText('1');
+
+      await page.reload();
+      await expect(favoriteButton).toContainText('1');
+
+      await favoriteButton.click();
+      await expect(favoriteButton).toContainText('0');
+
+      await page.reload();
+      await expect(favoriteButton).toContainText('0');
+    });
   });
 
   test.describe('invalid article', () => {

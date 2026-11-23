@@ -4,7 +4,6 @@ import { faker } from '@faker-js/faker';
 import { createArticle } from '../helpers/articles';
 import { editorUser } from '../helpers/ensure-user';
 
-
 test.describe('Articles', () => {
   test.describe('valid article', () => {
     test('user can create a new article and it is visible on the Global Feed', async ({ page }) => {
@@ -307,7 +306,7 @@ test.describe('Articles', () => {
       await editorPage.publishArticleButton.click({ force: true });
 
       expect(posts).toBe(1);
-      
+
       await published;
     });
   });

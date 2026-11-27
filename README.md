@@ -39,6 +39,8 @@ The [Allure report](https://oluizmnunes.github.io/playwright-conduit/) is the la
 
 ## Approach
 
+Conduit is a single-page application. A page object still fits: a page is a route or screen, not a file the server returns. URL views are treated as pages. The header, navigation, and footer that stay on every screen are treated as components.
+
 - Page objects in `pages/` hold the locators and actions for the login and editor screens.
 - Article tests share one signed-in session. The setup project saves it to `playwright/.auth/user.json`, and the `chromium` project loads that state.
 - Login tests stay signed out. Each one creates its own user and signs in through the UI, after the article tests, so a new login does not replace the saved token.
